@@ -3,14 +3,12 @@
 #' .. content for \details{} ..
 #'
 #' @title
-
+#' @param elev
+#' @param unit
 #' @return
 #' @author njtierney
 #' @export
-get_example_shapefile <- function() {
-
-  f <- system.file("ex/lux.shp", package="terra")
-  v <- vect(f)
-  v
-
+set_units <- function(elev, unit = "m") {
+  units(elev) <- unit
+  elev
 }

@@ -2,54 +2,17 @@
 source("packages.R")
 tar_source("R")
 
-my_controller <- crew_controller_local(
-  name = "example",
-  workers = 3 # three cores
-)
-
-tar_option_set(
-  controller = my_controller
-)
-
+geotargets_option_set(gdal_raster_driver = "COG")
 tar_assign({
-  example_rast <- get_example_rast() |> tar_terra_rast()
+  tif_file <- system.file("ex/elev.tif", package = "terra") |> tar_file()
 
-  example_shapefile <- get_example_shapefile() |> tar_terra_vect()
+  elev <- rast(tif_file) |> tar_terra_rast()
 
-  country_codes <- country_codes(query = "Australia")
+  elev_m <- set_units(elev, unit = "m") |> tar_terra_rast()
 
-  example_gadm <- get_gadm_country(country_codes$ISO3) |> tar_terra_vect()
+  vect_file <- system.file("ex", "lux.shp", package = "terra") |> tar_file()
 
-  example_gadm_multiple <- get_gadm_country(c("Australia", "New Zealand")) |>
-    tar_terra_vect()
+  terra_vect <- vect(vect_file) |> tar_terra_vect()
 
-  # alternative approach to using gadm for boundaries
-  example_cgaz_country <- cgaz_country("Australia") |> tar_terra_vect()
-
-  example_cgaz_countries <- cgaz_country(c("Australia", "New Zealand")) |>
-    tar_terra_vect()
-
-  # example of using the spatvector from one target into another
-  example_sds_raster_oz <- sds_gebco(
-    country_vect = example_cgaz_country,
-    resolution = 1
-  ) |>
-    tar_terra_rast()
-
-  ## demonstration using many countries and multiple workers
-  some_countries <- countrycode::codelist$iso3c[1:6] |> tar_target()
-
-  country_shapes <- cgaz_country(some_countries) |>
-    tar_terra_vect(pattern = map(some_countries))
-
-  my_file <- system.file("ex/elev.tif", package = "terra") |>
-    tar_target(format = "file")
-
-  my_map <- terra::rast(my_file) |> tar_terra_rast()
-
-  rast_split <- tar_terra_tiles(
-    raster = my_map,
-    ncol = 2,
-    nrow = 2
-  )
+  vect_proj <- project(terra_vect, "EPSG:2196") |> tar_terra_vect()
 })
