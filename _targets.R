@@ -1,13 +1,12 @@
 ## Load your packages, e.g. library(targets).
-source("./packages.R")
+source("packages.R")
+tar_source("R")
 
-## Load your R files
-lapply(list.files("./R", full.names = TRUE), source)
-
-my_controller <- crew::crew_controller_local(
-  name = "bananas",
-  workers = 3
+my_controller <- crew_controller_local(
+  name = "example",
+  workers = 3 # three cores
 )
+
 tar_option_set(
   controller = my_controller
 )
