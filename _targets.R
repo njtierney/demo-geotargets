@@ -6,6 +6,9 @@ geotargets_option_set(gdal_raster_driver = "COG")
 tar_assign({
   tif_file <- system.file("ex/elev.tif", package = "terra") |> tar_file()
 
+  # no longer tar_target()
+  # for *rast* objects:
+  # tar_terra_rast()
   elev <- rast(tif_file) |> tar_terra_rast()
 
   elev_m <- set_units(elev, unit = "m") |> tar_terra_rast()
